@@ -62,7 +62,7 @@ jobs:
     permissions:
       contents: read
     secrets:
-      policy-bot-server-url: https://app.yourserver.com/policy-bot/
+      policy-bot-server-url: ${{ secrets.POLICY_BOT_BASE_URL }}
   # <some other jobs>
 ```
 

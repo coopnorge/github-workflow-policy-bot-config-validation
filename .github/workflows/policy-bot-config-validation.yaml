@@ -1,38 +1,58 @@
+name: Validate policy-bot config file
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 on:
   workflow_call:
     inputs:
-      example-string-input:
+      policy-bot-config-path:
         type: string
-        default: example-string-input
+        default: .policy.yml
+        required: false
+        description: |
+          Relative path of policy-bot config file. Defaults to `.policy.yml`.
+      policy-bot-server-url:
+        type: string
         required: true
         description: |
-          Description of the example string input.
-      example-number-input:
-        type: number
-        default: 42
-        required: false
-        description: |
-          Example number input.
-      example-boolean-input:
-        type: boolean
-        default: false
-        required: false
-        description: |
-          Description of the example boolean input.
+          Base url where policy bot is available.
 
-    secrets:
-      example-secret:
-        required: false
-        description: |
-          Example secret.
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  show-inputs:
+  validate-policy-bot-config:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - name: Display workflow inputs and secrets
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate policy-bot config
         run: |
-          echo "String input: ${{ inputs.example-string-input }}"
-          echo "Boolean input: ${{ inputs.example-boolean-input }}"
-          echo "Number input: ${{ inputs.example-number-input }}"
-          echo "Secret: ${{ secrets.example-secret }}"
+          set -euo pipefail
+          policy_bot_server_url="${{ inputs.policy-bot-server-url }}"
+          policy_bot_server_url="${policy_bot_server_url%/}/"
+          echo "Uploading ${{ inputs.policy-bot-config-path }} to ${policy_bot_server_url}api/validate"
+          response_code=$(
+            curl --silent \
+              "${policy_bot_server_url}api/validate" \
+              --request PUT \
+              --upload-file "${{ inputs.policy-bot-config-path }}" \
+              --write-out "%{http_code}" \
+              --output response.json
+            )
+          message=$(jq '.message' response.json)
+
+          if [[ $response_code -ne 200 ]]; then
+            echo "::error::$message"
+            exit 1
+          fi
+
+          echo "::notice::$message"

@@ -18,11 +18,13 @@ inputs:
     required: false
     description: |
       Relative path of policy-bot config file. Defaults to `.policy.yml`.
+secrets:
   policy-bot-server-url:
-    type: string
     required: true
     description: |
-      Base url where policy bot is available.
+      Base url where policy bot is available. This is defined as a secret
+      because GitHub requires secrets to be passed as secrets and does
+      not allow passing it as a regular input.
 ```
 
 This job can be added to the CI/CD workflow as follows:
@@ -59,8 +61,8 @@ jobs:
     uses: coopnorge/github-workflow-policy-bot-config-validation/.github/workflows/policy-bot-config-validation.yaml@v0
     permissions:
       contents: read
-    with:
-      policy-bot-server-url: https://app.yourserver.com/policy-bot/
+    secrets:
+      policy-bot-server-url: ${{ secrets.POLICY_BOT_BASE_URL }}
   # <some other jobs>
 ```
 

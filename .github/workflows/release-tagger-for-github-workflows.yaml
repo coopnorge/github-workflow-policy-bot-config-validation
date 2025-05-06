@@ -1,0 +1,57 @@
+name: Release Tagger
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+on:
+  workflow_call:
+    inputs:
+      tag-name:
+        type: string
+        required: true
+        description: Tag name being released.
+    secrets:
+      GH_TOKEN:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag-name }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Add major version tag
+        run: |
+          # Check if the input tag indicates an alpha or beta release
+          if [[ "${{ inputs.tag-name }}" == *alpha* || "${{ inputs.tag-name }}" == *beta* ]]; then
+            echo "Pre-release (alpha/beta) detected. Skipping major tag update."
+            exit 0
+          fi
+
+          # Extract vX from vX.Y.Z
+          NEW_TAG=$(echo "${{ inputs.tag-name }}" | cut -d'.' -f1)
+          echo "New major tag will be: $NEW_TAG"
+
+          # Force update the local tag
+          git tag -f "$NEW_TAG"
+
+          # Force push the updated tag
+          git push -f https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} refs/tags/"$NEW_TAG"

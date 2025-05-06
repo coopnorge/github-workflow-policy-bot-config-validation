@@ -1,0 +1,4 @@
+techdocs:
+  - 'docs/**'
+  - 'devtools/techdocs.*'
+  - '.vale/**'

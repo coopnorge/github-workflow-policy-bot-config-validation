@@ -1,0 +1,16 @@
+# nonk8s
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: policy-bot-config-validation
+  title: policy-bot-config-validation
+  description: Validate policy-bot configuration
+  annotations:
+    github.com/project-slug: coopnorge/policy-bot-config-validation
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - github-workflow
+spec:
+  type: library
+  owner: engineering
+  lifecycle: experimental

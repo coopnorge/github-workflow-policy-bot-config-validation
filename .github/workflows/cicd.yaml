@@ -53,6 +53,8 @@ jobs:
     uses: coopnorge/github-workflow-policy-bot-config-validation/.github/workflows/policy-bot-config-validation.yaml@v0
     permissions:
       contents: read
+    secrets:
+      policy-bot-server-url: ${{ secrets.POLICY_BOT_BASE_URL }}
 
   validate-ci-results:
     needs:

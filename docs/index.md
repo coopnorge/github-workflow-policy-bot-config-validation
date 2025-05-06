@@ -1,13 +1,10 @@
 # github-workflow-policy-bot-config-validation
 
-This is an example documentation for the example workflow. For a real example,
-see
-[here](https://github.com/coopnorge/github-workflow-terraform-validation/blob/main/README.md).
+Validate policy-bot config.
 
 ## Goals
 
-* Demonstrate how an example workflow looks like.
-* Demonstrate how to access inputs and secrets in a reusable workflow.
+* Make sure that policy-bot config file is valid.
 
 ## Usage
 
@@ -15,45 +12,73 @@ see
 
 ```yaml
 inputs:
-  example-string-input:
+  policy-bot-config-path:
     type: string
-    default: example-string-input
+    default: .policy.yml
+    required: false
+    description: |
+      Relative path of policy-bot config file. Defaults to `.policy.yml`.
+secrets:
+  policy-bot-server-url:
     required: true
     description: |
-      Description of the example string input.
-  example-number-input:
-    type: number
-    default: 42
-    required: false
-    description: |
-      Example number input.
-  example-boolean-input:
-    type: boolean
-    default: false
-    required: false
-    description: |
-      Description of the example boolean input.
-
-secrets:
-  example-secret:
-    required: false
-    description: |
-      Example secret.
+      Base url where policy bot is available. This is defined as a secret
+      because GitHub requires secrets to be passed as secrets and does
+      not allow passing it as a regular input.
 ```
 
-This job can be added to your workflow as follows:
+This job can be added to the CI/CD workflow as follows:
 
 ```yaml
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      # ...
+      # ...
+      validate-policy-bot-config: ${{ steps.changes.outputs.policy-bot == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+        id: changes
+        with:
+          list-files: json
+          filters: |
+            # ...
+            # ...
+            policy-bot:
+              - '.policy.yml'
+
   # <some other jobs>
-  example-ci:
-    name: "Example CI"
+  validate-policy-bot-config:
+    name: Validate policy-bot Configuration
+    needs: setup
+    if: needs.setup.outputs.validate-policy-bot-config == 'true'
     uses: coopnorge/github-workflow-policy-bot-config-validation/.github/workflows/policy-bot-config-validation.yaml@v0
-    with:
-      example-string-input: Example string
-      example-number-input: 12
-      example-boolean-input: true
+    permissions:
+      contents: read
     secrets:
-      example-secret: ${{ secrets.EXAMPLE_SECRET }}
+      policy-bot-server-url: ${{ secrets.POLICY_BOT_BASE_URL }}
   # <some other jobs>
+```
+
+It can be added as a required check as follows:
+
+```yaml
+  validate-ci-results:
+    needs:
+      - ...
+      - ...
+      - validate-policy-bot-config
+    permissions: {}
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1
+        name: "Catch errors"
+        if: ${{ contains(join(needs.*.result, ','), 'failure') || contains(join(needs.*.result, ','), 'cancelled') }}
 ```

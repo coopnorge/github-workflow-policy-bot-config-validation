@@ -13,11 +13,13 @@ on:
         required: false
         description: |
           Relative path of policy-bot config file. Defaults to `.policy.yml`.
+    secrets:
       policy-bot-server-url:
-        type: string
         required: true
         description: |
-          Base url where policy bot is available.
+          Base url where policy bot is available. This is defined as a secret
+          because GitHub requires secrets to be passed as secrets and does
+          not allow passing it as a regular input.
 
 defaults:
   run:
@@ -37,7 +39,7 @@ jobs:
       - name: Validate policy-bot config
         run: |
           set -euo pipefail
-          policy_bot_server_url="${{ inputs.policy-bot-server-url }}"
+          policy_bot_server_url="${{ secrets.policy-bot-server-url }}"
           policy_bot_server_url="${policy_bot_server_url%/}/"
           echo "Uploading ${{ inputs.policy-bot-config-path }} to ${policy_bot_server_url}api/validate"
           response_code=$(

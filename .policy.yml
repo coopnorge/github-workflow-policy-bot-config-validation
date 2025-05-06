@@ -53,3 +53,4 @@ approval_rules:
       methods:
         github_review: true
         comments: []
+      invalid: value

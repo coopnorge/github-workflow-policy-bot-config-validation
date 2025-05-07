@@ -9,6 +9,7 @@ spec:
   description: Validate policy-bot configuration
   actions:
     enableReusableWorkflowsForOrganizationAccess: true
+  visibility: public
   branches:
     default: main
     protection:

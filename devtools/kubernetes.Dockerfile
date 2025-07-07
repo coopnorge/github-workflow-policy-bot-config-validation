@@ -1,2 +1,2 @@
 # Do not remove, used by pallet validation
-FROM ghcr.io/coopnorge/engineering-docker-images/e0/devtools-kubernetes-v1beta1:latest@sha256:fe9d9e7ad0b727a426f68147bcb4ad80f51a1213e100bd067e618353682a9a07
+FROM ghcr.io/coopnorge/engineering-docker-images/e0/devtools-kubernetes-v1beta1:latest@sha256:31c65924d57756a2e62a14cd40b7016dcdc08415e0b0c8f9b1c78b2d5d54feed

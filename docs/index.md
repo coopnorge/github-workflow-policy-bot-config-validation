@@ -2,6 +2,11 @@
 
 Validate policy-bot config.
 
+!!! note "Mage workflows"
+
+    Repositories using mage workflows don't need this as policy-bot config
+    validation is already a part of mage as of v16.
+
 ## Goals
 
 * Make sure that policy-bot config file is valid.

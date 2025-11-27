@@ -9,7 +9,7 @@ Validate policy-bot config.
 
 ## Goals
 
-* Make sure that policy-bot config file is valid.
+- Make sure that policy-bot config file is valid.
 
 ## Usage
 
@@ -45,7 +45,8 @@ jobs:
     outputs:
       # ...
       # ...
-      validate-policy-bot-config: ${{ steps.changes.outputs.policy-bot == 'true' }}
+      validate-policy-bot-config:
+        ${{ steps.changes.outputs.policy-bot == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
@@ -74,16 +75,18 @@ jobs:
 It can be added as a required check as follows:
 
 ```yaml
-  validate-ci-results:
-    needs:
-      - ...
-      - ...
-      - validate-policy-bot-config
-    permissions: {}
-    if: always()
-    runs-on: ubuntu-24.04
-    steps:
-      - run: exit 1
-        name: "Catch errors"
-        if: ${{ contains(join(needs.*.result, ','), 'failure') || contains(join(needs.*.result, ','), 'cancelled') }}
+validate-ci-results:
+  needs:
+    - ...
+    - ...
+    - validate-policy-bot-config
+  permissions: {}
+  if: always()
+  runs-on: ubuntu-24.04
+  steps:
+    - run: exit 1
+      name: "Catch errors"
+      if:
+        ${{ contains(join(needs.*.result, ','), 'failure') ||
+        contains(join(needs.*.result, ','), 'cancelled') }}
 ```

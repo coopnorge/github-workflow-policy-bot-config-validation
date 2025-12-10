@@ -1,4 +1,3 @@
----
 # reference https://github.com/coopnorge/cloud-platform-apis/blob/main/cloud-platform-apis/templates/repositoryconfig.github.coop.no/definition.yaml
 # status of this repository: https://argocd.internal.coop/applications?search=pallet-policy-bot-config-validation&showFavorites=false&proj=&sync=&autoSync=&health=&namespace=&cluster=&labels=
 apiVersion: github.coop.no/v1alpha1

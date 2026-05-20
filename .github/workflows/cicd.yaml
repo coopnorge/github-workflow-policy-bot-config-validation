@@ -12,7 +12,7 @@ jobs:
       contents: read
       pull-requests: read
     name: Setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       run-kubernetes-ci: ${{ ( steps.changes.outputs.kubernetes == 'true' || steps.changes.outputs.workflows == 'true' ) &&
         github.event_name == 'pull_request' }}
@@ -61,13 +61,13 @@ jobs:
       - kubernetes-ci
       - policy-bot
       - techdocs
-    if: always()
-    runs-on: ubuntu-latest
+    if: failure() || cancelled()
+    runs-on: ubuntu-slim
     permissions: {}
     steps:
       - run: exit 1
         name: "Catch errors"
-        if: ${{ contains(join(needs.*.result, ','), 'failure') || contains(join(needs.*.result, ','), 'cancelled') }}
+
   techdocs:
     needs: setup
     if: needs.setup.outputs.techdocs == 'true'

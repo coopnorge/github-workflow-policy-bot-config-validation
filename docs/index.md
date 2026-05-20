@@ -40,7 +40,7 @@ This job can be added to the CI/CD workflow as follows:
 jobs:
   setup:
     name: Setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       pull-requests: read
@@ -83,12 +83,9 @@ validate-ci-results:
     - ...
     - validate-policy-bot-config
   permissions: {}
-  if: always()
-  runs-on: ubuntu-24.04
+  if: failure() || cancelled()
+  runs-on: ubuntu-slim
   steps:
     - run: exit 1
       name: "Catch errors"
-      if:
-        ${{ contains(join(needs.*.result, ','), 'failure') ||
-        contains(join(needs.*.result, ','), 'cancelled') }}
 ```
